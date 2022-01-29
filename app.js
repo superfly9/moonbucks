@@ -1,19 +1,8 @@
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => document.querySelectorAll(selector);
-
-// const app = {
-//   addMenuHandler() {
-//     $(".add-btn").addEventListener("click", (e) => {
-//       console.log("e", e);
-//       e.preventDefault();
-//     });
-//   },
-//   init() {
-//     this.addMenuHandler();
-//   },
-// };
-
-// app.init();
+const $closest = (e, selector) => e.target.closest(selector);
+const $$currentTarget = (e, selector) =>
+  e.currentTarget.querySelectorAll(selector);
 
 // step1
 // [O] 에스프레소 메뉴에 새로운 메뉴를 확인 버튼 또는 엔터키 입력으로 추가한다.
@@ -21,8 +10,8 @@ const $$ = (selector) => document.querySelectorAll(selector);
 // [O] 사용자 입력값이 빈 값이라면 추가되지 않는다.
 // [O] 메뉴의 수정 버튼을 눌러 메뉴 이름 수정할 수 있다.
 // [O] 메뉴 수정시 브라우저에서 제공하는 prompt 인터페이스를 활용한다.
-// 메뉴 삭제 버튼을 이용하여 메뉴 삭제할 수 있다.
-// 메뉴 삭제시 브라우저에서 제공하는 confirm 인터페이스를 활용한다.
+// [O] 메뉴 삭제 버튼을 이용하여 메뉴 삭제할 수 있다.
+// [O] 메뉴 삭제시 브라우저에서 제공하는 confirm 인터페이스를 활용한다.
 // 총 메뉴 갯수를 count하여 상단에 보여준다.
 function App() {
   //form vs button어디에 이벤트 추가할 것인가
@@ -78,13 +67,16 @@ function App() {
   });
   //edit => 이벤트 위임 이용
   $(".menu-list").addEventListener("click", (e) => {
-    console.log(e.target, e.currentTarget);
     if (e.target.classList.contains("menu-edit-button")) editMenuHandler(e);
     if (e.target.classList.contains("menu-remove-button")) {
-      const target = e.target.closest(".menu-list-item");
-      target.remove();
-      console.log("[remove Target]:", target);
+      if (window.confirm("삭제하시겠습니까?")) {
+        const target = $closest(e, ".menu-list-item");
+        target.remove();
+        const menuCount = $$currentTarget(e, ".menu-list-item").length;
+        $("#menu-count").innerText = `${menuCount}개`;
+      }
     }
   });
 }
+
 App();
