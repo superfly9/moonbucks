@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" type="text/css" />
+  </head>
+  <body>
+    <header>
+      <a href="/">
+        <h1>🌝 문벅스 메뉴 관리</h1>
+      </a>
+      <nav>
+        <button class="cafe-category-name">☕ 에스프레소</button>
+        <button class="cafe-category-name">🥤 프라푸치노</button>
+        <button class="cafe-category-name">🍹 블렌디드</button>
+        <button class="cafe-category-name">🫖 티바나</button>
+        <button class="cafe-category-name">🍰 디저트</button>
+      </nav>
+    </header>
+
+    <main>
+      <div class="wrapper">
+        <div class="category-title">
+          <h2>☕ 에스프레소 메뉴 관리</h2>
+          <span id="menu-count">총 0개</span>
+        </div>
+        <form id="menu-form">
+          <input
+            type="text"
+            autocomplete="off"
+            placeholder="메뉴이름"
+            id="menu-name"
+          />
+          <!-- type='button'안주면 엔터누를때 버튼에 대해 keypress이벤트 발생함 -->
+          <button type="button" class="add-btn">확인</button>
+        </form>
+        <ul class="menu-list"></ul>
+      </div>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>

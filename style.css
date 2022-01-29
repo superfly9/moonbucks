@@ -1,0 +1,94 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+body {
+  background-color: #f1f5f9;
+}
+header {
+  margin: 2rem 0;
+}
+header a {
+  color: black;
+  text-decoration: none;
+  display: block;
+  padding: 1rem;
+  text-align: center;
+}
+nav {
+  display: flex;
+  width: 90%;
+  margin: 1rem auto;
+}
+nav button {
+  cursor: pointer;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 10%), 0 1px 2px 0 rgb(0 0 0 / 6%);
+  padding: 5px 0;
+  margin: 0 10px;
+  flex: 1;
+  background-color: #fff;
+  height: 36px;
+  min-width: 64px;
+  border-style: none;
+  border-radius: 4px;
+}
+main {
+  width: 90%;
+  margin: 0 auto;
+  padding: 2.5rem 0;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 10%), 0 1px 2px 0 rgb(0 0 0 / 6%);
+  background-color: #fff;
+  text-align: center;
+}
+
+.category-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+}
+#menu-form {
+  display: flex;
+  padding: 0 2rem;
+}
+#menu-form input {
+  border-radius: 2rem;
+  background: #f1f5f9;
+  padding: 1rem 1.5rem;
+  width: 100%;
+  border: none;
+}
+#menu-form .add-btn {
+  margin-left: 0.5rem;
+  border-radius: 2rem;
+  border-style: none;
+  background-color: rgb(5, 150, 105);
+  min-width: 90px;
+}
+
+.menu-list-item {
+  margin-top: 1rem;
+  padding: 0.5rem 2rem;
+  display: flex;
+  align-items: center;
+  list-style: none;
+}
+.menu-list-item button:last-child {
+  margin-right: 0;
+}
+.menu-name {
+  width: 100%;
+  padding-left: 10px;
+  text-align: left;
+}
+.menu-edit-button,
+.menu-remove-button {
+  background-color: rgb(249, 250, 251);
+  color: rgb(107, 114, 128);
+  width: 60px;
+  cursor: pointer;
+  border: none;
+  border-radius: 2rem;
+  margin-right: 6px;
+}
