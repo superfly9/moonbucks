@@ -37,6 +37,19 @@ function App() {
     $("#menu-count").innerText = `총 ${menuCount}개`;
     $("#menu-name").value = "";
   };
+  const editMenuHandler = (e) => {
+    const menuTarget = e.target
+      .closest(".menu-list")
+      .querySelector(".menu-name");
+    const currentMenuName = menuTarget.innerText;
+    const editedMenuName = prompt(
+      "메뉴 이름을 수정하시겠습니까?",
+      currentMenuName
+    );
+    //값 입력 안 하거나 ,prompt창을 그냥 닫을 때 => 메뉴명 변경X
+    if (editedMenuName === "" || editedMenuName === null) return;
+    menuTarget.textContent = editedMenuName;
+  };
 
   const menuTemplate = (menuName) => `<li class="menu-list-item">
   <span class="menu-name">${menuName}</span>
@@ -65,18 +78,12 @@ function App() {
   });
   //edit => 이벤트 위임 이용
   $(".menu-list").addEventListener("click", (e) => {
-    console.log(e.target);
-    if (e.target.classList.contains("menu-edit-button")) {
-      const menuTarget = e.target
-        .closest(".menu-list")
-        .querySelector(".menu-name");
-      const currentMenuName = menuTarget.textContent;
-      console.log("[current Menu]:", currentMenuName);
-      const editedMenuName = prompt(
-        "메뉴 이름을 수정하시겠습니까?",
-        currentMenuName
-      );
-      menuTarget.textContent = editedMenuName;
+    console.log(e.target, e.currentTarget);
+    if (e.target.classList.contains("menu-edit-button")) editMenuHandler(e);
+    if (e.target.classList.contains("menu-remove-button")) {
+      const target = e.target.closest(".menu-list-item");
+      target.remove();
+      console.log("[remove Target]:", target);
     }
   });
 }
