@@ -12,18 +12,76 @@ const $$currentTarget = (e, selector) =>
 // [O] 메뉴 수정시 브라우저에서 제공하는 prompt 인터페이스를 활용한다.
 // [O] 메뉴 삭제 버튼을 이용하여 메뉴 삭제할 수 있다.
 // [O] 메뉴 삭제시 브라우저에서 제공하는 confirm 인터페이스를 활용한다.
-// 총 메뉴 갯수를 count하여 상단에 보여준다.
+// [O] 총 메뉴 갯수를 count하여 상단에 보여준다.
+
+// step2
+// 추가
+// localStorage에도 데이터 저장
+
+// 수정
+// 아이디 값으로 찾고, 그 값을 업데이트 후 로컬스토리지에도 저장
+
+// 삭제
+// 해당 키 값으로 로컬 스토리지에서도 삭제
+
+const store = {
+  getStorage() {
+    return JSON.parse(localStorage.getItem("menu"));
+  },
+  setStorage(value) {
+    localStorage.setItem("menu", JSON.stringify(value));
+  },
+};
+
 function App() {
-  //form vs button어디에 이벤트 추가할 것인가
-  const addMenuName = () => {
-    if ($("#menu-name").value === "") {
-      return alert("값을 입력하세요");
+  this.state = {
+    espresso: [],
+    prapuccino: [],
+    blendid: [],
+    tivarna: [],
+    dessert: [],
+  };
+  this.currentCategory = "espresso";
+
+  this.init = () => {
+    if (store.getStorage() !== null) {
+      this.state = store.getStorage();
     }
-    const menuValue = $("#menu-name").value;
+    render();
+  };
+
+  const menuTemplate = () =>
+    this.state[this.currentCategory]
+      .map(
+        (item, index) =>
+          `<li class="menu-list-item" data-id=${index}>
+   <span class="menu-name">${item}</span>
+   <button
+     type="button"
+     class="menu-edit-button">
+     수정
+   </button>
+   <button
+     type="button"
+     class="menu-remove-button">
+     삭제
+   </button>
+ </li>`
+      )
+      .join("");
+
+  const render = (menuValue) => {
     const template = menuTemplate(menuValue);
-    $(".menu-list").insertAdjacentHTML("beforeend", template);
-    const menuCount = $$(".menu-list-item").length; // #menu-list에 li추가 후 바로 그 갯수를 계산해옴
-    $("#menu-count").innerText = `총 ${menuCount}개`;
+    $(".menu-list").innerHTML = template;
+    updateMenuCount();
+  };
+
+  const addMenuNameHandler = () => {
+    if ($("#menu-name").value === "") return alert("값을 입력하세요");
+    const menuValue = $("#menu-name").value;
+    this.state[this.currentCategory].push(menuValue);
+    store.setStorage(this.state);
+    render(menuValue);
     $("#menu-name").value = "";
   };
   const editMenuHandler = (e) => {
@@ -39,44 +97,40 @@ function App() {
     if (editedMenuName === "" || editedMenuName === null) return;
     menuTarget.textContent = editedMenuName;
   };
+  const removeMenuHandler = (e) => {
+    if (window.confirm("삭제하시겠습니까?")) {
+      const target = $closest(e, ".menu-list-item");
+      const removeId = Number(target.dataset.id);
+      target.remove();
+      const removedArr = this.state[this.currentCategory].filter(
+        (_, i) => i !== removeId
+      );
+      this.state[this.currentCategory] = removedArr;
+      store.setStorage(this.state);
+      updateMenuCount();
+    }
+  };
 
-  const menuTemplate = (menuName) => `<li class="menu-list-item">
-  <span class="menu-name">${menuName}</span>
-  <button
-    type="button"
-    class="menu-edit-button">
-    수정
-  </button>
-  <button
-    type="button"
-    class="menu-remove-button">
-    삭제
-  </button>
-</li>`;
+  const updateMenuCount = () => {
+    const menuCount = $$(".menu-list-item").length; // #menu-list에 li추가 후 바로 그 갯수를 계산해옴
+    $("#menu-count").innerText = `총 ${menuCount}개`;
+  };
+
   $("#menu-form").addEventListener("submit", (e) => {
     e.preventDefault();
   });
-  //add
-  $(".add-btn").addEventListener("click", addMenuName);
-  //add
+  $(".add-btn").addEventListener("click", addMenuNameHandler);
   $("#menu-name").addEventListener("keypress", (e) => {
-    //한글 입력시 keypress이벤트 발생 안 한다.아스키코드에 한글이 없어서 안됩니다.
     if (e.key !== "Enter") return;
-    addMenuName();
-    // innerText vs textContent?
+    addMenuNameHandler(); // innerText vs textContent?
+    //한글 입력시 keypress이벤트 발생 안 한다.아스키코드에 한글이 없어서 안됩니다.
   });
   //edit => 이벤트 위임 이용
   $(".menu-list").addEventListener("click", (e) => {
     if (e.target.classList.contains("menu-edit-button")) editMenuHandler(e);
-    if (e.target.classList.contains("menu-remove-button")) {
-      if (window.confirm("삭제하시겠습니까?")) {
-        const target = $closest(e, ".menu-list-item");
-        target.remove();
-        const menuCount = $$currentTarget(e, ".menu-list-item").length;
-        $("#menu-count").innerText = `${menuCount}개`;
-      }
-    }
+    if (e.target.classList.contains("menu-remove-button")) removeMenuHandler(e);
   });
 }
 
-App();
+const app = new App();
+app.init();
