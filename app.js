@@ -41,7 +41,7 @@ function App() {
     tivarna: [],
     dessert: [],
   };
-  this.currentCategory = "espresso";
+  let currentCategory = "espresso";
 
   this.init = () => {
     if (store.getStorage() !== null) {
@@ -51,7 +51,7 @@ function App() {
   };
 
   const menuTemplate = () =>
-    this.state[this.currentCategory]
+    this.state[currentCategory]
       .map(
         (item, index) =>
           `<li class="menu-list-item" data-id=${index}>
@@ -70,8 +70,8 @@ function App() {
       )
       .join("");
 
-  const render = (menuValue) => {
-    const template = menuTemplate(menuValue);
+  const render = () => {
+    const template = menuTemplate();
     $(".menu-list").innerHTML = template;
     updateMenuCount();
   };
@@ -79,9 +79,9 @@ function App() {
   const addMenuNameHandler = () => {
     if ($("#menu-name").value === "") return alert("값을 입력하세요");
     const menuValue = $("#menu-name").value;
-    this.state[this.currentCategory].push(menuValue);
+    this.state[currentCategory].push(menuValue);
     store.setStorage(this.state);
-    render(menuValue);
+    render();
     $("#menu-name").value = "";
   };
   const editMenuHandler = (e) => {
@@ -102,12 +102,12 @@ function App() {
       const target = $closest(e, ".menu-list-item");
       const removeId = Number(target.dataset.id);
       target.remove();
-      const removedArr = this.state[this.currentCategory].filter(
+      const removedArr = this.state[currentCategory].filter(
         (_, i) => i !== removeId
       );
-      this.state[this.currentCategory] = removedArr;
+      this.state[currentCategory] = removedArr;
       store.setStorage(this.state);
-      updateMenuCount();
+      render();
     }
   };
 
