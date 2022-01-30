@@ -55,18 +55,18 @@ function App() {
       .map(
         (item, index) =>
           `<li class="menu-list-item" data-id=${index}>
-   <span class="menu-name">${item}</span>
-   <button
-     type="button"
-     class="menu-edit-button">
-     수정
-   </button>
-   <button
-     type="button"
-     class="menu-remove-button">
-     삭제
-   </button>
- </li>`
+              <span class="menu-name">${item}</span>
+              <button
+                type="button"
+                class="menu-edit-button">
+                수정
+              </button>
+              <button
+                type="button"
+                class="menu-remove-button">
+                삭제
+              </button>
+            </li>`
       )
       .join("");
 
@@ -85,17 +85,17 @@ function App() {
     $("#menu-name").value = "";
   };
   const editMenuHandler = (e) => {
-    const menuTarget = e.target
-      .closest(".menu-list")
-      .querySelector(".menu-name");
+    const parent = e.target.closest("li");
+    const menuTarget = parent.querySelector(".menu-name");
+    const editIndex = parent.closest("li").dataset.id;
     const currentMenuName = menuTarget.innerText;
-    const editedMenuName = prompt(
-      "메뉴 이름을 수정하시겠습니까?",
-      currentMenuName
-    );
+    const msg = "메뉴 이름을 수정하시겠습니까?";
+    const editedMenuName = prompt(msg, currentMenuName);
     //값 입력 안 하거나 ,prompt창을 그냥 닫을 때 => 메뉴명 변경X
     if (editedMenuName === "" || editedMenuName === null) return;
-    menuTarget.textContent = editedMenuName;
+    this.state[currentCategory][editIndex] = editedMenuName;
+    store.setStorage(this.state);
+    render();
   };
   const removeMenuHandler = (e) => {
     if (window.confirm("삭제하시겠습니까?")) {
