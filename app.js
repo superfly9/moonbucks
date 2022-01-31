@@ -41,7 +41,6 @@ function App() {
     tivarna: [],
     dessert: [],
   };
-  let currentCategory = "espresso";
 
   this.init = () => {
     if (store.getStorage() !== null) {
@@ -49,6 +48,8 @@ function App() {
     }
     render();
   };
+
+  let currentCategory = "espresso";
 
   const menuTemplate = () =>
     this.state[currentCategory]
@@ -85,12 +86,11 @@ function App() {
     $("#menu-name").value = "";
   };
   const editMenuHandler = (e) => {
-    const parent = e.target.closest("li");
-    const menuTarget = parent.querySelector(".menu-name");
-    const editIndex = parent.closest("li").dataset.id;
-    const currentMenuName = menuTarget.innerText;
+    const $parent = e.target.closest("li");
+    const $menuTarget = $parent.querySelector(".menu-name");
+    const editIndex = $parent.closest("li").dataset.id;
     const msg = "메뉴 이름을 수정하시겠습니까?";
-    const editedMenuName = prompt(msg, currentMenuName);
+    const editedMenuName = prompt(msg, $menuTarget.innerText);
     //값 입력 안 하거나 ,prompt창을 그냥 닫을 때 => 메뉴명 변경X
     if (editedMenuName === "" || editedMenuName === null) return;
     this.state[currentCategory][editIndex] = editedMenuName;
@@ -101,12 +101,9 @@ function App() {
     if (window.confirm("삭제하시겠습니까?")) {
       const target = $closest(e, ".menu-list-item");
       const removeId = Number(target.dataset.id);
-      target.remove();
-      const removedArr = this.state[currentCategory].filter(
-        (_, i) => i !== removeId
-      );
-      this.state[currentCategory] = removedArr;
+      this.state[currentCategory].splice(removeId, 1);
       store.setStorage(this.state);
+      target.remove();
       render();
     }
   };
