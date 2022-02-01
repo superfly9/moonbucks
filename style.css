@@ -52,6 +52,7 @@ main {
   display: flex;
   padding: 0 2rem;
 }
+
 #menu-form input {
   border-radius: 2rem;
   background: #f1f5f9;
@@ -82,6 +83,7 @@ main {
   padding-left: 10px;
   text-align: left;
 }
+.menu-soldout-button,
 .menu-edit-button,
 .menu-remove-button {
   background-color: rgb(249, 250, 251);
@@ -91,4 +93,7 @@ main {
   border: none;
   border-radius: 2rem;
   margin-right: 6px;
+}
+.sold-out {
+  text-decoration: line-through;
 }

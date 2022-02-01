@@ -56,7 +56,14 @@ function App() {
       .map(
         (item, index) =>
           `<li class="menu-list-item" data-id=${index}>
-              <span class="menu-name">${item.menu}</span>
+              <span class="${item.soldOut ? "sold-out" : ""} menu-name">${
+            item.menu
+          }</span>
+              <button
+                type="button"
+                class="menu-soldout-button">
+                품절
+              </button>
               <button
                 type="button"
                 class="menu-edit-button">
@@ -108,6 +115,14 @@ function App() {
     }
   };
 
+  const soldOutMenuHandler = (e) => {
+    //해당 메뉴에 soldOut추가, storage에 데이터 저장 및 렌더링
+    let idx = e.target.closest("li").dataset.id;
+    this.state[currentCategory][idx].soldOut = !this.state[currentCategory][idx]
+      .soldOut;
+    store.setStorage(this.state);
+    render();
+  };
   const updateMenuCount = () => {
     const menuCount = this.state[currentCategory].length;
     $("#menu-count").innerText = `총 ${menuCount}개`;
@@ -128,13 +143,14 @@ function App() {
   $(".add-btn").addEventListener("click", addMenuNameHandler);
   $("#menu-name").addEventListener("keypress", (e) => {
     if (e.key !== "Enter") return;
-    addMenuNameHandler(); // innerText vs textContent?
-    //한글 입력시 keypress이벤트 발생 안 한다.아스키코드에 한글이 없어서 안됩니다.
+    addMenuNameHandler();
   });
   //edit => 이벤트 위임 이용
   $(".menu-list").addEventListener("click", (e) => {
     if (e.target.classList.contains("menu-edit-button")) editMenuHandler(e);
     if (e.target.classList.contains("menu-remove-button")) removeMenuHandler(e);
+    if (e.target.classList.contains("menu-soldout-button"))
+      soldOutMenuHandler(e);
   });
 }
 
