@@ -56,7 +56,7 @@ function App() {
       .map(
         (item, index) =>
           `<li class="menu-list-item" data-id=${index}>
-              <span class="menu-name">${item}</span>
+              <span class="menu-name">${item.menu}</span>
               <button
                 type="button"
                 class="menu-edit-button">
@@ -80,7 +80,7 @@ function App() {
   const addMenuNameHandler = () => {
     if ($("#menu-name").value === "") return alert("값을 입력하세요");
     const menuValue = $("#menu-name").value;
-    this.state[currentCategory].push(menuValue);
+    this.state[currentCategory].push({ menu: menuValue });
     store.setStorage(this.state);
     render();
     $("#menu-name").value = "";
@@ -93,7 +93,7 @@ function App() {
     const editedMenuName = prompt(msg, $menuTarget.innerText);
     //값 입력 안 하거나 ,prompt창을 그냥 닫을 때 => 메뉴명 변경X
     if (editedMenuName === "" || editedMenuName === null) return;
-    this.state[currentCategory][editIndex] = editedMenuName;
+    this.state[currentCategory][editIndex] = { menu: editedMenuName };
     store.setStorage(this.state);
     render();
   };
@@ -109,10 +109,19 @@ function App() {
   };
 
   const updateMenuCount = () => {
-    const menuCount = $$(".menu-list-item").length; // #menu-list에 li추가 후 바로 그 갯수를 계산해옴
+    const menuCount = this.state[currentCategory].length;
     $("#menu-count").innerText = `총 ${menuCount}개`;
   };
 
+  $("nav").addEventListener("click", (e) => {
+    const isCategoryBtn = e.target.classList.contains("cafe-category-name");
+    if (isCategoryBtn) {
+      currentCategory = e.target.dataset.categoryName;
+      console.log("[current]:", currentCategory);
+      $(".category-title").innerText = `${e.target.innerText} 메뉴관리`;
+      render();
+    }
+  });
   $("#menu-form").addEventListener("submit", (e) => {
     e.preventDefault();
   });
