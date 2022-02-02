@@ -2,6 +2,13 @@ import { $, $closest } from "./utils/dom.js";
 import store from "./store/storage.js";
 
 const BASE_URL = "http://localhost:3000/api";
+const MENU_API = {
+  async getAllMenuByCategory(category) {
+    const response = await fetch(`${BASE_URL}/category/${category}/menu`);
+    const result = await response.json();
+    return result;
+  },
+};
 function App() {
   this.state = {
     espresso: [],
@@ -11,10 +18,10 @@ function App() {
     desert: [],
   };
 
-  this.init = () => {
-    if (store.getStorage() !== null) {
-      this.state = store.getStorage();
-    }
+  this.init = async () => {
+    this.state[currentCategory] = await MENU_API.getAllMenuByCategory(
+      currentCategory
+    );
     render();
     initEventListener();
   };
@@ -26,8 +33,8 @@ function App() {
       .map(
         (item, index) =>
           `<li class="menu-list-item" data-id=${index}>
-              <span class="${item.soldOut ? "sold-out" : ""} menu-name">${
-            item.menu
+              <span class="${item.isSoldOut ? "sold-out" : ""} menu-name">${
+            item.name
           }</span>
               <button
                 type="button"
@@ -71,11 +78,8 @@ function App() {
       alert(`메뉴 추가 에러 : ${e.message}`);
     }
     try {
-      const listRes1 = await fetch(
-        `${BASE_URL}/category/${currentCategory}/menu`
-      );
-      const listRes2 = await listRes1.json();
-      this.state[currentCategory] = listRes2;
+      let res = await MENU_API.getAllMenuByCategory(currentCategory);
+      this.state[currentCategory] = res;
       render();
       $("#menu-name").value = "";
     } catch (e) {}
@@ -88,7 +92,7 @@ function App() {
     const editedMenuName = prompt(msg, $menuTarget.innerText);
     //값 입력 안 하거나 ,prompt창을 그냥 닫을 때 => 메뉴명 변경X
     if (editedMenuName === "" || editedMenuName === null) return;
-    this.state[currentCategory][editIndex] = { menu: editedMenuName };
+    this.state[currentCategory][editIndex] = { name: editedMenuName };
     store.setStorage(this.state);
     render();
   };
@@ -106,8 +110,9 @@ function App() {
   const soldOutMenuHandler = (e) => {
     //해당 메뉴에 soldOut추가, storage에 데이터 저장 및 렌더링
     let idx = e.target.closest("li").dataset.id;
-    this.state[currentCategory][idx].soldOut = !this.state[currentCategory][idx]
-      .soldOut;
+    this.state[currentCategory][idx].isSoldOut = !this.state[currentCategory][
+      idx
+    ].isSoldOut;
     store.setStorage(this.state);
     render();
   };
