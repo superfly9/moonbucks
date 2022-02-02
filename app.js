@@ -8,6 +8,21 @@ const MENU_API = {
     const result = await response.json(); // Promise{<resolved>} = {id, name}
     return result;
   },
+  async editMenuName(category, menuId, name) {
+    const response = await fetch(
+      `${BASE_URL}/category/${category}/menu/${menuId}
+    `,
+      {
+        method: "PUT",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({ name }),
+      }
+    );
+    if (!response.ok) return console.log("Error");
+    return response.json();
+  },
   async soldOutToggle(category, menuId) {
     const response = await fetch(
       `${BASE_URL}/category/${category}/menu/${menuId}/soldout
@@ -98,16 +113,17 @@ function App() {
       $("#menu-name").value = "";
     } catch (e) {}
   };
-  const editMenuHandler = (e) => {
+  const editMenuHandler = async (e) => {
     const $parent = e.target.closest("li");
     const $menuTarget = $parent.querySelector(".menu-name");
-    const editIndex = $parent.closest("li").dataset.id;
+    const editId = $parent.closest("li").dataset.id;
     const msg = "메뉴 이름을 수정하시겠습니까?";
     const editedMenuName = prompt(msg, $menuTarget.innerText);
     //값 입력 안 하거나 ,prompt창을 그냥 닫을 때 => 메뉴명 변경X
     if (editedMenuName === "" || editedMenuName === null) return;
-    this.state[currentCategory][editIndex] = { name: editedMenuName };
-    store.setStorage(this.state);
+    await MENU_API.editMenuName(currentCategory, editId, editedMenuName);
+    const res = await MENU_API.getAllMenuByCategory(currentCategory);
+    this.state[currentCategory] = res;
     render();
   };
   const removeMenuHandler = (e) => {
