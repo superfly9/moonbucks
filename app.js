@@ -5,7 +5,21 @@ const BASE_URL = "http://localhost:3000/api";
 const MENU_API = {
   async getAllMenuByCategory(category) {
     const response = await fetch(`${BASE_URL}/category/${category}/menu`);
-    const result = await response.json();
+    const result = await response.json(); // Promise{<resolved>} = {id, name}
+    return result;
+  },
+  async soldOutToggle(category, menuId) {
+    const response = await fetch(
+      `${BASE_URL}/category/${category}/menu/${menuId}/soldout
+    `,
+      {
+        method: "PUT",
+      }
+    );
+    if (!response.status) {
+      console.log("Error Occured");
+    }
+    const result = response.json(); // Promise{<pending>}
     return result;
   },
 };
@@ -31,8 +45,8 @@ function App() {
   const menuTemplate = () =>
     this.state[currentCategory]
       .map(
-        (item, index) =>
-          `<li class="menu-list-item" data-id=${index}>
+        (item) =>
+          `<li class="menu-list-item" data-id=${item.id}>
               <span class="${item.isSoldOut ? "sold-out" : ""} menu-name">${
             item.name
           }</span>
@@ -107,13 +121,12 @@ function App() {
     }
   };
 
-  const soldOutMenuHandler = (e) => {
+  const soldOutMenuHandler = async (e) => {
     //해당 메뉴에 soldOut추가, storage에 데이터 저장 및 렌더링
-    let idx = e.target.closest("li").dataset.id;
-    this.state[currentCategory][idx].isSoldOut = !this.state[currentCategory][
-      idx
-    ].isSoldOut;
-    store.setStorage(this.state);
+    let menuId = e.target.closest("li").dataset.id;
+    await MENU_API.soldOutToggle(currentCategory, menuId);
+    let result = await MENU_API.getAllMenuByCategory(currentCategory);
+    this.state[currentCategory] = result;
     render();
   };
   const updateMenuCount = () => {
