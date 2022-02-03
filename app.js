@@ -3,12 +3,21 @@ import store from "./store/storage.js";
 
 const BASE_URL = "http://localhost:3000/api";
 const MENU_API = {
+  async addMenuByCategory(category, name) {
+    const response = await fetch(`${BASE_URL}/category/${category}/menu`, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({ name }),
+    });
+  },
   async getAllMenuByCategory(category) {
     const response = await fetch(`${BASE_URL}/category/${category}/menu`);
     const result = await response.json(); // Promise{<resolved>} = {id, name}
     return result;
   },
-  async editMenuName(category, menuId, name) {
+  async updateMenu(category, menuId, name) {
     const response = await fetch(
       `${BASE_URL}/category/${category}/menu/${menuId}
     `,
@@ -23,7 +32,7 @@ const MENU_API = {
     if (!response.ok) return console.log("Error");
     return response.json();
   },
-  async soldOutToggle(category, menuId) {
+  async toggleSoldOutMenu(category, menuId) {
     const response = await fetch(
       `${BASE_URL}/category/${category}/menu/${menuId}/soldout
     `,
@@ -92,17 +101,9 @@ function App() {
 
   const addMenuNameHandler = async () => {
     if ($("#menu-name").value === "") return alert("값을 입력하세요");
-    const menuValue = $("#menu-name").value;
+    const menuName = $("#menu-name").value;
     try {
-      const res1 = await fetch(`${BASE_URL}/category/${currentCategory}/menu`, {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify({ name: menuValue }),
-      });
-      const res2 = await res1.json();
-      if (res1.status !== 200 && res2.message) throw Error(res2.message);
+      await MENU_API.addMenuByCategory(currentCategory, menuName);
     } catch (e) {
       alert(`메뉴 추가 에러 : ${e.message}`);
     }
@@ -111,7 +112,10 @@ function App() {
       this.state[currentCategory] = res;
       render();
       $("#menu-name").value = "";
-    } catch (e) {}
+    } catch (e) {
+      //async에서 throw한 걸 catch에서 받아옴
+      alert(`메뉴 조회 에러 : ${e.message}`);
+    }
   };
   const editMenuHandler = async (e) => {
     const $parent = e.target.closest("li");
@@ -121,9 +125,10 @@ function App() {
     const editedMenuName = prompt(msg, $menuTarget.innerText);
     //값 입력 안 하거나 ,prompt창을 그냥 닫을 때 => 메뉴명 변경X
     if (editedMenuName === "" || editedMenuName === null) return;
-    await MENU_API.editMenuName(currentCategory, editId, editedMenuName);
-    const res = await MENU_API.getAllMenuByCategory(currentCategory);
-    this.state[currentCategory] = res;
+    await MENU_API.updateMenu(currentCategory, editId, editedMenuName);
+    this.state[currentCategory] = await MENU_API.getAllMenuByCategory(
+      currentCategory
+    );
     render();
   };
   const removeMenuHandler = (e) => {
@@ -140,7 +145,7 @@ function App() {
   const soldOutMenuHandler = async (e) => {
     //해당 메뉴에 soldOut추가, storage에 데이터 저장 및 렌더링
     let menuId = e.target.closest("li").dataset.id;
-    await MENU_API.soldOutToggle(currentCategory, menuId);
+    await MENU_API.toggleSoldOutMenu(currentCategory, menuId);
     let result = await MENU_API.getAllMenuByCategory(currentCategory);
     this.state[currentCategory] = result;
     render();
