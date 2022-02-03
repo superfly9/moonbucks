@@ -29,7 +29,7 @@ const MENU_API = {
         body: JSON.stringify({ name }),
       }
     );
-    if (!response.ok) return console.log("Error");
+    if (!response.ok) return alert("Update Error");
     return response.json();
   },
   async toggleSoldOutMenu(category, menuId) {
@@ -41,7 +41,7 @@ const MENU_API = {
       }
     );
     if (!response.status) {
-      console.log("Error Occured");
+      alert("Error Occured");
     }
     const result = response.json(); // Promise{<pending>}
     return result;
@@ -166,10 +166,13 @@ function App() {
     $("#menu-count").innerText = `총 ${menuCount}개`;
   };
   const initEventListener = () => {
-    $("nav").addEventListener("click", (e) => {
+    $("nav").addEventListener("click", async (e) => {
       const isCategoryBtn = e.target.classList.contains("cafe-category-name");
       if (isCategoryBtn) {
         currentCategory = e.target.dataset.categoryName;
+        this.state[currentCategory] = await MENU_API.getAllMenuByCategory(
+          currentCategory
+        );
         $(".category-title").innerText = `${e.target.innerText} 메뉴관리`;
         render();
       }
