@@ -1,5 +1,4 @@
 import { $, $closest } from "./utils/dom.js";
-import store from "./store/storage.js";
 
 const BASE_URL = "http://localhost:3000/api";
 const MENU_API = {
@@ -11,6 +10,7 @@ const MENU_API = {
       },
       body: JSON.stringify({ name }),
     });
+    if (!response.ok) throw Error("메뉴 추가 에러");
   },
   async getAllMenuByCategory(category) {
     const response = await fetch(`${BASE_URL}/category/${category}/menu`);
@@ -45,6 +45,16 @@ const MENU_API = {
     }
     const result = response.json(); // Promise{<pending>}
     return result;
+  },
+  async deleteMenu(category, menuId) {
+    const response = await fetch(
+      `${BASE_URL}/category/${category}/menu/${menuId}`,
+      { method: "DELETE" } // method : 'DELETE' 정의 안해주면 GET으로 인식하기에 404 NOT FOUND뜸
+    );
+    if (!response.ok) {
+      const result = await response.json();
+      throw Error(result.message);
+    }
   },
 };
 function App() {
@@ -131,13 +141,14 @@ function App() {
     );
     render();
   };
-  const removeMenuHandler = (e) => {
+  const removeMenuHandler = async (e) => {
     if (window.confirm("삭제하시겠습니까?")) {
       const target = $closest(e, ".menu-list-item");
-      const removeId = Number(target.dataset.id);
-      this.state[currentCategory].splice(removeId, 1);
-      store.setStorage(this.state);
-      target.remove();
+      const removeId = target.dataset.id;
+      await MENU_API.deleteMenu(currentCategory, removeId);
+      this.state[currentCategory] = await MENU_API.getAllMenuByCategory(
+        currentCategory
+      );
       render();
     }
   };
